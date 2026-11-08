@@ -1,0 +1,9 @@
+<idea-plugin>
+    <id>com.zplflow.intellij</id>
+    <name>zplflow — ZPL Live Preview</name>
+    <vendor email="support@zplflow.com" url="https://zplflow.com">zplflow</vendor>
+    <description><![CDATA[
+        Pixel-perfect ZPL thermal label live preview and developer tools powered by zplflow.
+    ]]></description>
+    <depends>com.intellij.modules.platform</depends>
+</idea-plugin>

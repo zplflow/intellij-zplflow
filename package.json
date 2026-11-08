@@ -1,0 +1,9 @@
+{
+  "name": "intellij-zplflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JetBrains IntelliJ Platform Plugin for zplflow — ZPL Live Preview & Label Tools",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}
