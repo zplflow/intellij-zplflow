@@ -6,4 +6,17 @@
         Pixel-perfect ZPL thermal label live preview and developer tools powered by zplflow.
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType
+            name="ZPL File"
+            implementationClass="com.zplflow.intellij.ZplFileType"
+            fieldName="INSTANCE"
+            language="ZPL"
+            extensions="zpl;prn;label" />
+        <toolWindow
+            id="zplflow Preview"
+            anchor="right"
+            factoryClass="com.zplflow.intellij.ZplPreviewToolWindowFactory" />
+    </extensions>
 </idea-plugin>
