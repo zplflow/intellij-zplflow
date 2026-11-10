@@ -14,5 +14,7 @@ describe('ZplLanguage, ZplFileType, and ZplflowSettings', () => {
     assert.ok(settings.includes('var dpi: Int = 203'));
     assert.ok(settings.includes('var widthMm: Double = 101.6'));
     assert.ok(settings.includes('var heightMm: Double = 152.4'));
+    assert.ok(settings.includes('var lspEnabled: Boolean = true'));
+    assert.ok(settings.includes('var lspPath: String = ""'));
   });
 });

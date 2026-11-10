@@ -6,6 +6,7 @@
         Pixel-perfect ZPL thermal label live preview and developer tools powered by zplflow.
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="zplflow-lsp.xml">com.intellij.modules.lsp</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType
