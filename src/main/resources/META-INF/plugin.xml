@@ -37,6 +37,11 @@
     <depends optional="true" config-file="zplflow-lsp.xml">com.intellij.modules.lsp</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+            parentId="tools"
+            instance="com.zplflow.intellij.ZplflowConfigurable"
+            id="com.zplflow.intellij.ZplflowConfigurable"
+            displayName="zplflow" />
         <fileType
             name="ZPL File"
             implementationClass="com.zplflow.intellij.ZplFileType"

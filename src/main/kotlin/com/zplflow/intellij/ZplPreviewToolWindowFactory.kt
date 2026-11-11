@@ -47,11 +47,14 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
 
                     val zplText = document.text
                     val settings = ZplflowSettings.getInstance().state
+                    val apiKey = settings.apiKey.ifBlank {
+                        System.getenv("ZPLFLOW_API_KEY") ?: System.getenv("ZPL_API_KEY") ?: ""
+                    }
                     ApplicationManager.getApplication().executeOnPooledThread {
                         try {
                             val res = client.renderPreview(
                                 settings.apiUrl,
-                                settings.apiKey,
+                                apiKey,
                                 PreviewRequestOptions(
                                     zpl = zplText,
                                     dpi = settings.dpi,
