@@ -80,6 +80,8 @@ object ZplLspServerResolver {
         // 4. Local workspace / dev monorepo build check
         val currentDir = Paths.get("").toAbsolutePath().toFile()
         val devCandidates = listOf(
+            File(currentDir, "bin/$platformBinaryName"),
+            File(currentDir, "bin/$genericBinaryName"),
             File(currentDir, "../zplflow/dist/$platformBinaryName"),
             File(currentDir, "../zplflow/bin/$genericBinaryName"),
             File(currentDir, "../../zplflow/dist/$platformBinaryName"),
