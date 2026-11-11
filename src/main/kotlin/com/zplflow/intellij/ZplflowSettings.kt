@@ -19,6 +19,7 @@ class ZplflowSettings : PersistentStateComponent<ZplflowSettings.State> {
         var widthMm: Double = 101.6,
         var heightMm: Double = 152.4,
         var renderMode: String = "onSave",
+        var debounceMs: Int = 450,
         var lspEnabled: Boolean = true,
         var lspPath: String = ""
     )

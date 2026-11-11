@@ -10,6 +10,8 @@ class ZplflowConfigurable : SearchableConfigurable {
     private val dpiCombo = JComboBox(arrayOf(152, 203, 300, 600))
     private val widthMmField = JTextField(10)
     private val heightMmField = JTextField(10)
+    private val renderModeCombo = JComboBox(arrayOf("onSave", "onType"))
+    private val debounceMsField = JTextField(10)
     private val lspEnabledBox = JCheckBox("Enable ZPL Language Server (LSP)")
     private val lspPathField = JTextField(30)
 
@@ -27,6 +29,10 @@ class ZplflowConfigurable : SearchableConfigurable {
             .addLabeledComponent("Default DPI:", dpiCombo)
             .addLabeledComponent("Label Width (mm):", widthMmField)
             .addLabeledComponent("Label Height (mm):", heightMmField)
+            .addLabeledComponent("Preview Mode:", renderModeCombo)
+            .addTooltip("onSave (renders when saving) or onType (debounced real-time rendering).")
+            .addLabeledComponent("Debounce Delay (ms):", debounceMsField)
+            .addTooltip("Delay in ms before triggering real-time rendering when in onType mode.")
             .addComponent(lspEnabledBox)
             .addLabeledComponent("Custom LSP Binary Path:", lspPathField)
             .addTooltip("Leave empty to use bundled zplflow-lsp binary.")
@@ -45,6 +51,8 @@ class ZplflowConfigurable : SearchableConfigurable {
                 dpiCombo.selectedItem != s.dpi ||
                 widthMmField.text.toDoubleOrNull() != s.widthMm ||
                 heightMmField.text.toDoubleOrNull() != s.heightMm ||
+                renderModeCombo.selectedItem != s.renderMode ||
+                debounceMsField.text.toIntOrNull() != s.debounceMs ||
                 lspEnabledBox.isSelected != s.lspEnabled ||
                 lspPathField.text != s.lspPath
     }
@@ -56,6 +64,8 @@ class ZplflowConfigurable : SearchableConfigurable {
         s.dpi = dpiCombo.selectedItem as? Int ?: 203
         s.widthMm = widthMmField.text.toDoubleOrNull() ?: 101.6
         s.heightMm = heightMmField.text.toDoubleOrNull() ?: 152.4
+        s.renderMode = renderModeCombo.selectedItem as? String ?: "onSave"
+        s.debounceMs = debounceMsField.text.toIntOrNull() ?: 450
         s.lspEnabled = lspEnabledBox.isSelected
         s.lspPath = lspPathField.text.trim()
     }
@@ -67,6 +77,8 @@ class ZplflowConfigurable : SearchableConfigurable {
         dpiCombo.selectedItem = s.dpi
         widthMmField.text = s.widthMm.toString()
         heightMmField.text = s.heightMm.toString()
+        renderModeCombo.selectedItem = s.renderMode
+        debounceMsField.text = s.debounceMs.toString()
         lspEnabledBox.isSelected = s.lspEnabled
         lspPathField.text = s.lspPath
     }

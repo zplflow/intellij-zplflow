@@ -52,5 +52,18 @@
             id="zplflow Preview"
             anchor="right"
             factoryClass="com.zplflow.intellij.ZplPreviewToolWindowFactory" />
+        <formattingService
+            implementation="com.zplflow.intellij.ZplDocumentFormattingService" />
+        <enterHandlerDelegate
+            implementation="com.zplflow.intellij.ZplEnterHandler" />
     </extensions>
+
+    <actions>
+        <action id="zplflow.reformat"
+                class="com.zplflow.intellij.ReformatZplAction"
+                text="Format ZPL Label"
+                description="Format and indent ZPL label commands">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
