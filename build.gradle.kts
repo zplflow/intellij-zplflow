@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.25"
+    id("org.jetbrains.kotlin.jvm") version "2.1.0"
     id("org.jetbrains.intellij.platform") version "2.1.0"
 }
 
@@ -16,12 +16,29 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity("2024.2")
+        local("/home/valerio/Scaricati/GoLand-2026.3")
+        bundledPlugin("com.intellij.modules.jcef")
         instrumentationTools()
     }
     testImplementation(kotlin("test"))
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions {
+        freeCompilerArgs.add("-Xskip-metadata-version-check")
+    }
+}
+
+tasks.named("buildSearchableOptions") {
+    enabled = false
+}
+
+tasks.prepareSandbox {
+    from("bin") {
+        into("${pluginName.get()}/bin")
+    }
 }

@@ -49,7 +49,7 @@ object ZplLspServerResolver {
 
     fun resolve(configuredPath: String? = null, pluginDir: File? = null): String? {
         // 1. User configured path
-        if (!configuredPath.isNull prematureBlank()) {
+        if (!configuredPath.isNullOrBlank()) {
             val trimmed = configuredPath.trim()
             val file = File(trimmed)
             if (isExecutable(file)) {
@@ -111,6 +111,4 @@ object ZplLspServerResolver {
 
         return null
     }
-
-    private fun String?.prematureBlank(): Boolean = this == null || this.isBlank()
 }
