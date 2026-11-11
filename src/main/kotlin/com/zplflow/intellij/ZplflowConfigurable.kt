@@ -18,14 +18,14 @@ class ZplflowConfigurable : SearchableConfigurable {
     private var myPanel: JPanel? = null
 
     override fun getId(): String = "com.zplflow.intellij.ZplflowConfigurable"
-    override fun getDisplayName(): String = "zplflow"
+    override fun getDisplayName(): String = "ZplFlow"
 
     override fun createComponent(): JComponent {
         val panel = FormBuilder.createFormBuilder()
             .addLabeledComponent("API Key:", apiKeyField)
-            .addTooltip("Your zplflow API key (e.g. zpl_live_xxx) with pipelines:apply scope.")
+            .addTooltip("Your ZplFlow API key (e.g. zpl_live_xxx) with pipelines:apply scope.")
             .addLabeledComponent("API URL:", apiUrlField)
-            .addTooltip("Base URL for zplflow API (defaults to https://api.zplflow.com).")
+            .addTooltip("Base URL for ZplFlow API (defaults to https://api.zplflow.com).")
             .addLabeledComponent("Default DPI:", dpiCombo)
             .addLabeledComponent("Label Width (mm):", widthMmField)
             .addLabeledComponent("Label Height (mm):", heightMmField)
@@ -35,7 +35,7 @@ class ZplflowConfigurable : SearchableConfigurable {
             .addTooltip("Delay in ms before triggering real-time rendering when in onType mode.")
             .addComponent(lspEnabledBox)
             .addLabeledComponent("Custom LSP Binary Path:", lspPathField)
-            .addTooltip("Leave empty to use bundled zplflow-lsp binary.")
+            .addTooltip("Leave empty to use bundled ZplFlow LSP binary.")
             .addComponentFillVertically(JPanel(), 0)
             .panel
 

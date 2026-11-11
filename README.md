@@ -1,6 +1,6 @@
-# zplflow for JetBrains IDEs (IntelliJ IDEA, GoLand, WebStorm, PyCharm)
+# ZplFlow for JetBrains IDEs (IntelliJ IDEA, GoLand, WebStorm, PyCharm)
 
-Official JetBrains IDE plugin for **zplflow** — pixel-perfect ZPL thermal label live preview, built-in Language Server (LSP 3.17) with 188 official Zebra commands, real-time parameter breakdown, and multi-DPI resolution switching.
+Official JetBrains IDE plugin for **ZplFlow** — pixel-perfect ZPL thermal label live preview, built-in Language Server (LSP 3.17) with 188 official Zebra commands, real-time parameter breakdown, code formatting, and multi-DPI resolution switching.
 
 ---
 
@@ -13,59 +13,54 @@ Official JetBrains IDE plugin for **zplflow** — pixel-perfect ZPL thermal labe
 - **Zero Configuration**: Resolves precompiled binaries automatically on Linux, macOS, and Windows.
 
 ### 🖨️ 2. JCEF Live Preview ToolWindow
-- **Pixel-Perfect Rendering**: Side-by-side interactive preview in the right sidebar ToolWindow (`zplflow Preview`).
+- **Pixel-Perfect Rendering**: Side-by-side interactive preview in the right sidebar ToolWindow (`ZplFlow Preview`).
+- **Real-Time Modes**: Choose between `onSave` (renders on document save) or `onType` (debounced real-time preview as you type).
 - **Dynamic Resolution Switching**: 152 DPI (6 dpmm), 203 DPI (8 dpmm), 300 DPI (12 dpmm), 600 DPI (24 dpmm).
 - **Fast Local Caching**: In-memory SHA-256 LRU cache for lag-free undo/redo.
 - **0 Token Charge**: Live preview requests use `POST /v1/pipelines/preview` with zero billing cost.
 
-### 📄 3. File Type Registration
+### 🧹 3. Code Formatting & Auto-Indent
+- **Reformat Code**: Reformat ZPL labels cleanly with `Ctrl + Alt + L` (Code → Reformat Code) or right-click → **Format ZPL Label**.
+- **Auto-Indent on Enter**: Automatically aligns commands inside `^XA...^XZ` blocks with 2 spaces.
+
+### 📄 4. File Type Registration
 - Recognizes `.zpl`, `.prn`, and `.label` files automatically with custom icons.
 
 ---
 
-## 🚀 How to Run & Test in IntelliJ IDEA
+## 🚀 How to Run & Test in IntelliJ IDEA / GoLand
 
-### Method 1: Run via Gradle (`runIde`)
-1. Open IntelliJ IDEA.
-2. Select **File → Open** and select the directory:
-   ```
-   /home/valerio/Progetti/intellij-zplflow
-   ```
-3. Wait for IntelliJ to sync the Gradle project.
-4. In the **Gradle** tool window (right sidebar), navigate to:
-   ```
-   Tasks → intellij platform → runIde
-   ```
-   *(Or run `./gradlew runIde` from the built-in terminal).*
-5. A sandbox instance of IntelliJ IDEA will launch with the **zplflow** plugin installed and active.
-6. Open any `.zpl` file to test autocompletion, hover docs, and the **zplflow Preview** tool window on the right.
-
-### Method 2: Build the Distributable Plugin Zip
-To create the plugin archive for manual installation or uploading to the JetBrains Marketplace:
-1. In the Gradle tool window, run:
-   ```
-   Tasks → intellij platform → buildPlugin
-   ```
-   *(Or run `./gradlew buildPlugin` from the terminal).*
-2. The distributable `.zip` file will be generated in:
+### Method 1: Install the Prebuilt Plugin Zip
+1. Open GoLand or IntelliJ IDEA.
+2. Go to **Settings / Preferences (`Ctrl+Alt+S`) → Plugins**.
+3. Click the gear icon ⚙️ → **Install Plugin from Disk...**.
+4. Select:
    ```
    build/distributions/intellij-zplflow-0.2.0.zip
    ```
-3. To install locally in any JetBrains IDE:
-   - Go to **Settings / Preferences → Plugins**.
-   - Click the gear icon ⚙️ → **Install Plugin from Disk...**.
-   - Select the generated `.zip` file.
+5. Click **Apply** / **OK** and restart IDE if prompted.
+6. Configure your API key under **Settings → Tools → ZplFlow**.
+7. Open any `.zpl` file and view the **ZplFlow Preview** panel on the right sidebar.
+
+### Method 2: Build from Source
+```bash
+./gradlew buildPlugin
+```
+The distributable `.zip` file will be generated in `build/distributions/`.
 
 ---
 
 ## ⚙️ Configuration & Settings
 
-Available under **Settings / Preferences → Tools → zplflow**:
-- **Enable Language Server (LSP)**: Toggle background LSP engine on/off.
-- **LSP Binary Path**: Optional custom path to `zplflow-lsp` executable (auto-detected if empty).
-- **API URL**: Base URL (`https://api.zplflow.com` or custom self-hosted gateway).
-- **API Key**: Optional API key for zplflow cloud services.
-- **Default Resolution**: 152, 203, 300, or 600 DPI.
+Available under **Settings / Preferences → Tools → ZplFlow**:
+- **API Key**: Your ZplFlow API key (`zpl_live_...`).
+- **API URL**: Base URL (`https://api.zplflow.com` or custom gateway).
+- **Default DPI**: 152, 203, 300, or 600 DPI.
+- **Label Width / Height (mm)**: Custom dimensions (defaults to 101.6 x 152.4 mm, 4x6").
+- **Preview Mode**: `onSave` or `onType`.
+- **Debounce Delay (ms)**: Real-time typing debounce (default 450ms).
+- **Enable Language Server (LSP)**: Toggle LSP engine on/off.
+- **Custom LSP Binary Path**: Optional custom path to `zplflow-lsp` executable (auto-detected if empty).
 
 ---
 

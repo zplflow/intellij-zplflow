@@ -72,7 +72,7 @@ class ZplflowClient(private val maxCacheEntries: Int = 50) {
      * Renders a ZPL document to a base64 encoded PNG, using the cache when possible.
      */
     fun renderPreview(baseUrl: String, apiKey: String, opts: PreviewRequestOptions): PreviewResponseData {
-        require(apiKey.isNotBlank()) { "Missing zplflow API key. Configure it in Settings > Tools > zplflow." }
+        require(apiKey.isNotBlank()) { "Missing ZplFlow API key. Configure it in Settings > Tools > ZplFlow." }
 
         val key = computeCacheKey(opts)
         synchronized(this) {

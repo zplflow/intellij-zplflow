@@ -28,7 +28,7 @@ class ZplDocumentFormattingService : AsyncDocumentFormattingService() {
         }
     }
 
-    override fun getNotificationGroupId(): String = "zplflow"
+    override fun getNotificationGroupId(): String = "ZplFlow"
 
-    override fun getName(): @NlsSafe String = "zplflow Formatter"
+    override fun getName(): @NlsSafe String = "ZplFlow Formatter"
 }

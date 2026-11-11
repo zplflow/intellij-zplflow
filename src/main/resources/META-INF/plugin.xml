@@ -1,9 +1,9 @@
 <idea-plugin>
     <id>com.zplflow.intellij</id>
-    <name>zplflow — ZPL Live Preview &amp; Label Tools</name>
-    <vendor email="support@zplflow.com" url="https://zplflow.com">zplflow</vendor>
+    <name>ZplFlow — ZPL Live Preview &amp; Label Tools</name>
+    <vendor email="support@zplflow.com" url="https://zplflow.com">ZplFlow</vendor>
     <description><![CDATA[
-        <p>The complete developer tooling suite for <b>Zebra Programming Language (ZPL)</b> in JetBrains IDEs, powered by <a href="https://zplflow.com">zplflow</a>.</p>
+        <p>The complete developer tooling suite for <b>Zebra Programming Language (ZPL)</b> in JetBrains IDEs, powered by <a href="https://zplflow.com">ZplFlow</a>.</p>
 
         <h3>✨ Features</h3>
         <ul>
@@ -12,13 +12,14 @@
             <li><b>Pixel-Perfect Live Preview</b>: Interactive JCEF live preview of thermal labels side-by-side with your code (0 token cost).</li>
             <li><b>Multi-DPI Resolution Switching</b>: Switch dynamically between 152, 203, 300, and 600 DPI printhead profiles.</li>
             <li><b>SHA-256 LRU Cache</b>: Instant undo/redo with zero redundant server round-trips.</li>
+            <li><b>Code Formatting &amp; Auto-indent</b>: Reformat ZPL commands into clean, indented blocks with <code>Ctrl + Alt + L</code>.</li>
             <li><b>Offline &amp; Multi-platform</b>: Zero external dependencies; bundled cross-platform binaries for Linux, macOS, and Windows.</li>
         </ul>
 
         <h3>🚀 Quick Start</h3>
         <ol>
             <li>Open any <code>.zpl</code>, <code>.prn</code>, or <code>.label</code> file.</li>
-            <li>Open the <b>zplflow Preview</b> Tool Window on the right sidebar.</li>
+            <li>Open the <b>ZplFlow Preview</b> Tool Window on the right sidebar.</li>
             <li>Edit your ZPL code to see real-time preview updates and LSP parameter suggestions.</li>
         </ol>
     ]]></description>
@@ -30,10 +31,12 @@
             <li>Added rich parameter documentation for 188 official Zebra commands.</li>
             <li>Real-time signature help and hover documentation.</li>
             <li>Multi-DPI live preview support (152, 203, 300, 600 DPI) with SHA-256 LRU caching.</li>
+            <li>Added ZPL code formatter (Ctrl+Alt+L) and auto-indent on Enter.</li>
         </ul>
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.jcef</depends>
     <depends optional="true" config-file="zplflow-lsp.xml">com.intellij.modules.lsp</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -41,7 +44,7 @@
             parentId="tools"
             instance="com.zplflow.intellij.ZplflowConfigurable"
             id="com.zplflow.intellij.ZplflowConfigurable"
-            displayName="zplflow" />
+            displayName="ZplFlow" />
         <fileType
             name="ZPL File"
             implementationClass="com.zplflow.intellij.ZplFileType"
@@ -49,7 +52,7 @@
             language="ZPL"
             extensions="zpl;prn;label" />
         <toolWindow
-            id="zplflow Preview"
+            id="ZplFlow Preview"
             anchor="right"
             factoryClass="com.zplflow.intellij.ZplPreviewToolWindowFactory" />
         <formattingService

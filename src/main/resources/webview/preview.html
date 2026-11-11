@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>zplflow Live Preview</title>
+  <title>ZplFlow Live Preview</title>
   <style>
     body {
       margin: 0;
@@ -97,7 +97,7 @@
 </head>
 <body>
   <div class="toolbar">
-    <span style="font-weight: 600; color: #ffffff;">zplflow</span>
+    <span style="font-weight: 600; color: #ffffff;">ZplFlow</span>
     <span id="page-indicator" style="color: #8c929d;">Page 1/1</span>
     <span class="spacer"></span>
     <span id="badge-cached" class="badge cached" style="display:none;">Cached (0ms)</span>
@@ -157,6 +157,11 @@
         }
       }
     };
+
+    if (window.__pendingPayload) {
+      window.updateZplPreview(window.__pendingPayload);
+      delete window.__pendingPayload;
+    }
   </script>
 </body>
 </html>
