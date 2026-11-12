@@ -1,6 +1,6 @@
 <idea-plugin>
-    <id>com.zplflow.intellij</id>
-    <name>ZplFlow — ZPL Live Preview &amp; Label Tools</name>
+    <id>com.zplflow</id>
+    <name>ZplFlow - ZPL Live Preview &amp; Label Tools</name>
     <vendor email="support@zplflow.com" url="https://zplflow.com">ZplFlow</vendor>
     <description><![CDATA[
         <p>The complete developer tooling suite for <b>Zebra Programming Language (ZPL)</b> in JetBrains IDEs, powered by <a href="https://zplflow.com">ZplFlow</a>.</p>
