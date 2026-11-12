@@ -14,7 +14,7 @@ import com.intellij.openapi.components.Storage
 class ZplflowSettings : PersistentStateComponent<ZplflowSettings.State> {
     data class State(
         var apiKey: String = "",
-        var apiUrl: String = "https://api.zplflow.com",
+        var apiUrl: String = "https://api.zplflow.io",
         var dpi: Int = 203,
         var widthMm: Double = 101.6,
         var heightMm: Double = 152.4,

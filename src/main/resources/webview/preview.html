@@ -324,7 +324,7 @@
       if (payload.error) {
         errBanner.style.display = 'block';
         if (payload.error.indexOf('Missing ZplFlow API key') !== -1) {
-          errBanner.innerHTML = 'Missing ZplFlow API key. Configure it in <b>Settings &gt; Tools &gt; ZplFlow</b> or <a href="https://zplflow.com" target="_blank" style="color: #6cb6ff; text-decoration: underline;">get a free API key</a> (live preview has 0 token cost).';
+          errBanner.innerHTML = 'Missing ZplFlow API key. Configure it in <b>Settings &gt; Tools &gt; ZplFlow</b> or <a href="https://zplflow.io" target="_blank" style="color: #6cb6ff; text-decoration: underline;">get a free API key</a> (live preview has 0 token cost).';
         } else {
           errBanner.textContent = payload.error;
         }

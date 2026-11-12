@@ -27,7 +27,7 @@ class ZplflowConfigurable : SearchableConfigurable {
         val apiKeyRow = JPanel(BorderLayout(8, 0)).apply {
             add(apiKeyField, BorderLayout.CENTER)
             val link = ActionLink("Get your free API key") {
-                BrowserUtil.browse("https://zplflow.com")
+                BrowserUtil.browse("https://zplflow.io")
             }.apply {
                 setExternalLinkIcon()
             }
@@ -38,7 +38,7 @@ class ZplflowConfigurable : SearchableConfigurable {
             .addLabeledComponent("API Key:", apiKeyRow)
             .addTooltip("Your ZplFlow API key (e.g. zpl_live_xxx). Live preview is free (0 token cost).")
             .addLabeledComponent("API URL:", apiUrlField)
-            .addTooltip("Base URL for ZplFlow API (defaults to https://api.zplflow.com).")
+            .addTooltip("Base URL for ZplFlow API (defaults to https://api.zplflow.io).")
             .addLabeledComponent("Default DPI:", dpiCombo)
             .addLabeledComponent("Label Width (mm):", widthMmField)
             .addLabeledComponent("Label Height (mm):", heightMmField)
@@ -73,7 +73,7 @@ class ZplflowConfigurable : SearchableConfigurable {
     override fun apply() {
         val s = ZplflowSettings.getInstance().state
         s.apiKey = String(apiKeyField.password).trim()
-        s.apiUrl = apiUrlField.text.trim().ifEmpty { "https://api.zplflow.com" }
+        s.apiUrl = apiUrlField.text.trim().ifEmpty { "https://api.zplflow.io" }
         s.dpi = dpiCombo.selectedItem as? Int ?: 203
         s.widthMm = widthMmField.text.toDoubleOrNull() ?: 101.6
         s.heightMm = heightMmField.text.toDoubleOrNull() ?: 152.4

@@ -14,7 +14,7 @@ Official JetBrains IDE plugin for **ZplFlow** — pixel-perfect ZPL thermal labe
 
 ### 🖨️ 2. JCEF Live Preview ToolWindow (Cloud-Powered)
 - **Pixel-Perfect Rendering**: Side-by-side interactive preview in the right sidebar ToolWindow (`ZplFlow Preview`). Powered by ZplFlow Cloud API.
-- **Free Live Preview**: Live preview requests use `POST /v1/pipelines/preview` with **0 token cost**. Requires a free API key from [zplflow.com](https://zplflow.com).
+- **Free Live Preview**: Live preview requests use `POST /v1/pipelines/preview` with **0 token cost**. Requires a free API key from [zplflow.io](https://zplflow.io).
 - **Interactive Dimensions & Presets**: Choose standard presets (`4" × 6"`, `4" × 4"`, `4" × 3"`, `3" × 2"`, `2" × 1"`) or adjust width/height in millimeters directly from the preview toolbar.
 - **Multi-DPI Resolution Switching**: Switch dynamically between 152 DPI (6 dpmm), 203 DPI (8 dpmm), 300 DPI (12 dpmm), and 600 DPI (24 dpmm).
 - **Multi-Page Navigation**: Flip through multiple labels with `◀` and `▶` page controls.
@@ -57,7 +57,7 @@ The distributable `.zip` file will be generated in `build/distributions/`.
 
 Available under **Settings / Preferences → Tools → ZplFlow**:
 - **API Key**: Your ZplFlow API key (`zpl_live_...`). Click **Get your free API key** to create one for free.
-- **API URL**: Base URL (`https://api.zplflow.com` or custom gateway).
+- **API URL**: Base URL (`https://api.zplflow.io` or custom gateway).
 - **Default DPI**: 152, 203, 300, or 600 DPI.
 - **Label Width / Height (mm)**: Custom dimensions (defaults to 101.6 x 152.4 mm, 4x6").
 - **Preview Mode**: `onSave` or `onType`.

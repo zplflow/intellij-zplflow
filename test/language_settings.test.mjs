@@ -10,7 +10,7 @@ describe('ZplLanguage, ZplFileType, and ZplflowSettings', () => {
 
     assert.ok(lang.includes('object ZplLanguage : Language("ZPL")'));
     assert.ok(ft.includes('override fun getDefaultExtension(): String = "zpl"'));
-    assert.ok(settings.includes('var apiUrl: String = "https://api.zplflow.com"'));
+    assert.ok(settings.includes('var apiUrl: String = "https://api.zplflow.io"'));
     assert.ok(settings.includes('var dpi: Int = 203'));
     assert.ok(settings.includes('var widthMm: Double = 101.6'));
     assert.ok(settings.includes('var heightMm: Double = 152.4'));
