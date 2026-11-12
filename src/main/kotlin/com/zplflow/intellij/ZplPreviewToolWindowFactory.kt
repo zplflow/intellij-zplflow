@@ -21,6 +21,8 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
+import com.intellij.ui.jcef.JBCefBrowserBase
+import com.intellij.ui.jcef.JBCefJSQuery
 import com.intellij.util.Alarm
 import org.cef.CefSettings
 import org.cef.browser.CefBrowser
@@ -50,6 +52,12 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
             return
         }
 
+        val settings = ZplflowSettings.getInstance().state
+        var currentWidthMm = settings.widthMm
+        var currentHeightMm = settings.heightMm
+        var currentDpi = settings.dpi
+        var currentPage = 0
+
         val browser = JBCefBrowser()
         val html = ZplPreviewToolWindowFactory::class.java
             .getResource("/webview/preview.html")
@@ -57,43 +65,19 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
         browser.loadHTML(html)
         panel.add(browser.component, BorderLayout.CENTER)
 
-        // Forward webview console messages directly to idea.log
-        browser.jbCefClient.addDisplayHandler(object : CefDisplayHandlerAdapter() {
-            override fun onConsoleMessage(
-                b: CefBrowser?,
-                level: CefSettings.LogSeverity?,
-                message: String?,
-                source: String?,
-                line: Int
-            ): Boolean {
-                LOG.info("ZplFlow WebView: [$level] $message ($source:$line)")
-                return false
-            }
-        }, browser.cefBrowser)
-
-        val content = ContentFactory.getInstance().createContent(panel, "", false)
-        toolWindow.contentManager.addContent(content)
-
-        fun isZplFile(vFile: VirtualFile?, sampleText: String? = null): Boolean {
-            if (vFile == null && sampleText == null) return false
-            val ext = vFile?.extension?.lowercase() ?: ""
-            if (ext in listOf("zpl", "prn", "label")) return true
-            if (vFile?.fileType == ZplFileType || vFile?.fileType?.name == "ZPL File") return true
-            if (sampleText != null && sampleText.trim().startsWith("^XA")) return true
-            return false
-        }
+        var lastActionPayload = ""
+        var lastActionTime = 0L
 
         fun doRender(zplText: String) {
             if (zplText.isBlank()) {
                 LOG.info("ZplFlow: doRender skipped (text is blank)")
                 return
             }
-            val settings = ZplflowSettings.getInstance().state
             val apiKey = settings.apiKey.ifBlank {
                 System.getenv("ZPLFLOW_API_KEY") ?: System.getenv("ZPL_API_KEY") ?: ""
             }
 
-            LOG.info("ZplFlow: starting preview render (url=${settings.apiUrl}, dpi=${settings.dpi}, apiKeyConfigured=${apiKey.isNotBlank()}, zplLen=${zplText.length})")
+            LOG.info("ZplFlow: starting preview render (url=${settings.apiUrl}, dpi=$currentDpi, W=${currentWidthMm}mm, H=${currentHeightMm}mm, page=$currentPage, apiKeyConfigured=${apiKey.isNotBlank()}, zplLen=${zplText.length})")
 
             ApplicationManager.getApplication().executeOnPooledThread {
                 try {
@@ -102,15 +86,25 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
                         apiKey,
                         PreviewRequestOptions(
                             zpl = zplText,
-                            dpi = settings.dpi,
-                            widthMm = settings.widthMm,
-                            heightMm = settings.heightMm
+                            dpi = currentDpi,
+                            widthMm = currentWidthMm,
+                            heightMm = currentHeightMm,
+                            page = currentPage
                         )
                     )
-                    LOG.info("ZplFlow: preview rendered successfully (fromCache=${res.fromCache}, remainingQuota=${res.rateLimitRemaining}, pages=${res.pageCount})")
+                    LOG.info("ZplFlow: preview rendered successfully (fromCache=${res.fromCache}, remainingQuota=${res.rateLimitRemaining}, pages=${res.pageCount}, page=${res.currentPage})")
                     val quotaVal = res.rateLimitRemaining?.toString() ?: "null"
                     val js = """(function() {
-                        var p = {"pngBase64":"${res.pngBase64}","dpi":${settings.dpi},"currentPage":${res.currentPage},"pageCount":${res.pageCount},"fromCache":${res.fromCache},"rateLimitRemaining":$quotaVal};
+                        var p = {
+                            "pngBase64":"${res.pngBase64}",
+                            "dpi":$currentDpi,
+                            "widthMm":$currentWidthMm,
+                            "heightMm":$currentHeightMm,
+                            "currentPage":${res.currentPage},
+                            "pageCount":${res.pageCount},
+                            "fromCache":${res.fromCache},
+                            "rateLimitRemaining":$quotaVal
+                        };
                         if (window.updateZplPreview) { window.updateZplPreview(p); } else { window.__pendingPayload = p; }
                     })();"""
                     browser.cefBrowser.executeJavaScript(js, "", 0)
@@ -127,6 +121,15 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
                     browser.cefBrowser.executeJavaScript(js, "", 0)
                 }
             }
+        }
+
+        fun isZplFile(vFile: VirtualFile?, sampleText: String? = null): Boolean {
+            if (vFile == null && sampleText == null) return false
+            val ext = vFile?.extension?.lowercase() ?: ""
+            if (ext in listOf("zpl", "prn", "label")) return true
+            if (vFile?.fileType == ZplFileType || vFile?.fileType?.name == "ZPL File") return true
+            if (sampleText != null && sampleText.trim().startsWith("^XA")) return true
+            return false
         }
 
         fun renderActiveEditor() {
@@ -148,11 +151,90 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
             }
         }
 
+        fun handleWebviewAction(json: String) {
+            val now = System.currentTimeMillis()
+            if (json == lastActionPayload && (now - lastActionTime) < 150) {
+                return
+            }
+            lastActionPayload = json
+            lastActionTime = now
+
+            try {
+                if (json.contains("\"changeDimensions\"")) {
+                    val wMatch = Regex(""""widthMm"\s*:\s*([0-9.]+)""").find(json)
+                    val hMatch = Regex(""""heightMm"\s*:\s*([0-9.]+)""").find(json)
+                    val dpiMatch = Regex(""""dpi"\s*:\s*(\d+)""").find(json)
+
+                    if (wMatch != null) currentWidthMm = wMatch.groupValues[1].toDoubleOrNull() ?: currentWidthMm
+                    if (hMatch != null) currentHeightMm = hMatch.groupValues[1].toDoubleOrNull() ?: currentHeightMm
+                    if (dpiMatch != null) currentDpi = dpiMatch.groupValues[1].toIntOrNull() ?: currentDpi
+
+                    settings.widthMm = currentWidthMm
+                    settings.heightMm = currentHeightMm
+                    settings.dpi = currentDpi
+
+                    LOG.info("ZplFlow: Updated dimensions from UI toolbar: W=${currentWidthMm}mm, H=${currentHeightMm}mm, DPI=$currentDpi")
+                    renderActiveEditor()
+                } else if (json.contains("\"changePage\"")) {
+                    val pageMatch = Regex(""""page"\s*:\s*(\d+)""").find(json)
+                    if (pageMatch != null) {
+                        currentPage = pageMatch.groupValues[1].toIntOrNull() ?: 0
+                        LOG.info("ZplFlow: Changed page to $currentPage")
+                        renderActiveEditor()
+                    }
+                }
+            } catch (e: Exception) {
+                LOG.warn("ZplFlow: Error parsing webview action: ${e.message}", e)
+            }
+        }
+
+        // Bridge 1: Console message bridge
+        browser.jbCefClient.addDisplayHandler(object : CefDisplayHandlerAdapter() {
+            override fun onConsoleMessage(
+                b: CefBrowser?,
+                level: CefSettings.LogSeverity?,
+                message: String?,
+                source: String?,
+                line: Int
+            ): Boolean {
+                if (message != null && message.startsWith("ZPLFLOW_ACTION:")) {
+                    handleWebviewAction(message.removePrefix("ZPLFLOW_ACTION:"))
+                    return true
+                }
+                LOG.info("ZplFlow WebView: [$level] $message ($source:$line)")
+                return false
+            }
+        }, browser.cefBrowser)
+
+        // Bridge 2: JBCefJSQuery (if supported by environment)
+        try {
+            val jsQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            jsQuery.addHandler { json ->
+                handleWebviewAction(json)
+                JBCefJSQuery.Response(null)
+            }
+        } catch (e: Throwable) {
+            LOG.info("ZplFlow: using console bridge for webview actions (${e.message})")
+        }
+
+        val content = ContentFactory.getInstance().createContent(panel, "", false)
+        toolWindow.contentManager.addContent(content)
+
         // 1. Initial render when webview finishes loading
         browser.jbCefClient.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadEnd(b: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 if (frame?.isMain == true) {
                     LOG.info("ZplFlow: JCEF onLoadEnd triggered, rendering active editor")
+                    val initJs = """(function() {
+                        if (window.updateZplPreview) {
+                            window.updateZplPreview({
+                                "dpi": $currentDpi,
+                                "widthMm": $currentWidthMm,
+                                "heightMm": $currentHeightMm
+                            });
+                        }
+                    })();"""
+                    browser.cefBrowser.executeJavaScript(initJs, "", 0)
                     renderActiveEditor()
                 }
             }
@@ -166,6 +248,7 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
                     val vFile = event.newFile
                     LOG.info("ZplFlow: editor selection changed to ${vFile?.name}")
                     if (isZplFile(vFile)) {
+                        currentPage = 0
                         renderActiveEditor()
                     }
                 }
@@ -191,12 +274,10 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
         val alarm = Alarm(Alarm.ThreadToUse.POOLED_THREAD, toolWindow.disposable)
         EditorFactory.getInstance().eventMulticaster.addDocumentListener(object : DocumentListener {
             override fun documentChanged(event: DocumentEvent) {
-                val settings = ZplflowSettings.getInstance().state
                 if (settings.renderMode != "onType") return
 
                 val doc = event.document
                 val vFile = FileDocumentManager.getInstance().getFile(doc)
-                // Read safely under ReadAction
                 val text = ApplicationManager.getApplication().runReadAction<String> { doc.text }
                 if (!isZplFile(vFile, text)) return
 

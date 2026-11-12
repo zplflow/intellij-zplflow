@@ -4,45 +4,112 @@
   <meta charset="UTF-8" />
   <title>ZplFlow Live Preview</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       padding: 0;
       background: #1e1f22;
       color: #dfe1e5;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      font-size: 12px;
     }
     .toolbar {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
+      gap: 6px;
+      padding: 6px 10px;
       background: #2b2d30;
       border-bottom: 1px solid #393b40;
-      font-size: 12px;
       flex-wrap: wrap;
     }
-    .toolbar select, .toolbar button {
+    .brand {
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      margin-right: 2px;
+    }
+    .toolbar select, .toolbar button, .toolbar input {
       background: #393b40;
       color: #dfe1e5;
       border: 1px solid #4e5157;
       border-radius: 4px;
-      padding: 3px 8px;
+      padding: 3px 6px;
       font-size: 11px;
+      font-family: inherit;
+      outline: none;
+    }
+    .toolbar select:focus, .toolbar button:focus, .toolbar input:focus {
+      border-color: #3574f0;
+    }
+    .toolbar input[type="number"] {
+      width: 52px;
+      text-align: right;
+    }
+    .toolbar select {
+      cursor: pointer;
+    }
+    .toolbar button {
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.1s ease, border-color 0.1s ease;
     }
     .toolbar button:hover {
       background: #3574f0;
       color: #ffffff;
-      cursor: pointer;
+      border-color: #3574f0;
+    }
+    .toolbar button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #393b40;
+      color: #dfe1e5;
+      border-color: #4e5157;
+    }
+    .dim-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      color: #a8adbd;
+      font-size: 11px;
+    }
+    .pagination {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #222427;
+      border: 1px solid #393b40;
+      border-radius: 4px;
+      padding: 1px 4px;
+    }
+    .pagination button {
+      border: none;
+      background: transparent;
+      padding: 2px 5px;
+      font-size: 10px;
+    }
+    .pagination button:hover:not(:disabled) {
+      background: #3574f0;
+    }
+    #page-indicator {
+      font-size: 11px;
+      color: #a8adbd;
+      padding: 0 4px;
+      min-width: 32px;
+      text-align: center;
     }
     .badge {
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 4px;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
       font-weight: 500;
+      letter-spacing: 0.2px;
     }
     .badge.cached {
       background: #1e3a24;
@@ -52,10 +119,6 @@
       background: #263342;
       color: #6cb6ff;
     }
-    .badge.dpi {
-      background: #393b40;
-      color: #dfe1e5;
-    }
     .spacer {
       margin-left: auto;
     }
@@ -64,7 +127,7 @@
       background: #471717;
       color: #ff8585;
       padding: 8px 12px;
-      font-size: 12px;
+      font-size: 11px;
       border-bottom: 1px solid #802424;
       word-break: break-word;
     }
@@ -74,7 +137,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
       background-image: radial-gradient(#2d3034 1px, transparent 1px);
       background-size: 16px 16px;
     }
@@ -85,6 +148,7 @@
       box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
       border-radius: 2px;
       display: none;
+      transition: transform 0.1s ease;
     }
     #placeholder {
       color: #8c929d;
@@ -97,28 +161,165 @@
 </head>
 <body>
   <div class="toolbar">
-    <span style="font-weight: 600; color: #ffffff;">ZplFlow</span>
-    <span id="page-indicator" style="color: #8c929d;">Page 1/1</span>
+    <span class="brand">ZplFlow</span>
+
+    <!-- Presets -->
+    <select id="preset-select" title="Preset Dimensions">
+      <option value="101.6,152.4" selected>4" × 6" (Shipping)</option>
+      <option value="101.6,101.6">4" × 4" (Square)</option>
+      <option value="101.6,76.2">4" × 3" (Pallet)</option>
+      <option value="76.2,50.8">3" × 2" (Bin / Item)</option>
+      <option value="50.8,25.4">2" × 1" (Shelf Tag)</option>
+      <option value="custom">Custom...</option>
+    </select>
+
+    <!-- Width and Height Inputs -->
+    <label class="dim-label" title="Width in millimeters">
+      W: <input id="width-input" type="number" step="0.1" min="10" max="400" value="101.6" /> mm
+    </label>
+    <label class="dim-label" title="Height in millimeters">
+      H: <input id="height-input" type="number" step="0.1" min="10" max="600" value="152.4" /> mm
+    </label>
+
+    <!-- DPI Selection -->
+    <select id="dpi-select" title="Printhead Resolution">
+      <option value="152">152 DPI</option>
+      <option value="203" selected>203 DPI</option>
+      <option value="300">300 DPI</option>
+      <option value="600">600 DPI</option>
+    </select>
+
+    <button id="apply-btn" title="Apply dimensions & refresh">Apply</button>
+
+    <!-- Multi-page Controls -->
+    <div class="pagination" title="Page navigation">
+      <button id="prev-page-btn" disabled title="Previous page">◀</button>
+      <span id="page-indicator">1 / 1</span>
+      <button id="next-page-btn" disabled title="Next page">▶</button>
+    </div>
+
     <span class="spacer"></span>
+
     <span id="badge-cached" class="badge cached" style="display:none;">Cached (0ms)</span>
     <span id="badge-quota" class="badge quota" style="display:none;">Quota</span>
-    <span id="badge-dpi" class="badge dpi">203 DPI</span>
   </div>
+
   <div id="error-banner"></div>
+
   <div class="viewport">
     <div id="placeholder">Open a ZPL file (.zpl, .prn, .label) to preview in real-time.</div>
     <img id="label-img" alt="ZPL Label Preview" />
   </div>
 
   <script>
+    let activeState = {
+      dpi: 203,
+      widthMm: 101.6,
+      heightMm: 152.4,
+      currentPage: 0,
+      pageCount: 1
+    };
+
+    function postAction(actionObj) {
+      const json = JSON.stringify(actionObj);
+      if (window.cefQuery) {
+        window.cefQuery({
+          request: json,
+          onSuccess: function() {},
+          onFailure: function() {}
+        });
+      }
+      // Console bridge fallback (intercepted by CefDisplayHandler)
+      console.log("ZPLFLOW_ACTION:" + json);
+    }
+
+    const presetSelect = document.getElementById('preset-select');
+    const widthInput = document.getElementById('width-input');
+    const heightInput = document.getElementById('height-input');
+    const dpiSelect = document.getElementById('dpi-select');
+    const applyBtn = document.getElementById('apply-btn');
+    const prevPageBtn = document.getElementById('prev-page-btn');
+    const nextPageBtn = document.getElementById('next-page-btn');
+    const pageIndicator = document.getElementById('page-indicator');
+
+    function syncPresetDropdown(w, h) {
+      const match = Array.from(presetSelect.options).find(opt => {
+        if (opt.value === 'custom') return false;
+        const [pw, ph] = opt.value.split(',').map(Number);
+        return Math.abs(pw - w) < 0.2 && Math.abs(ph - h) < 0.2;
+      });
+      if (match) {
+        presetSelect.value = match.value;
+      } else {
+        presetSelect.value = 'custom';
+      }
+    }
+
+    presetSelect.addEventListener('change', () => {
+      if (presetSelect.value !== 'custom') {
+        const [pw, ph] = presetSelect.value.split(',').map(Number);
+        widthInput.value = pw;
+        heightInput.value = ph;
+        applyDimensions();
+      }
+    });
+
+    function applyDimensions() {
+      const w = parseFloat(widthInput.value) || 101.6;
+      const h = parseFloat(heightInput.value) || 152.4;
+      const dpi = parseInt(dpiSelect.value, 10) || 203;
+
+      activeState.widthMm = w;
+      activeState.heightMm = h;
+      activeState.dpi = dpi;
+      syncPresetDropdown(w, h);
+
+      postAction({
+        action: "changeDimensions",
+        widthMm: w,
+        heightMm: h,
+        dpi: dpi
+      });
+    }
+
+    applyBtn.addEventListener('click', applyDimensions);
+
+    dpiSelect.addEventListener('change', applyDimensions);
+
+    widthInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyDimensions();
+      else presetSelect.value = 'custom';
+    });
+
+    heightInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyDimensions();
+      else presetSelect.value = 'custom';
+    });
+
+    prevPageBtn.addEventListener('click', () => {
+      if (activeState.currentPage > 0) {
+        postAction({
+          action: "changePage",
+          page: activeState.currentPage - 1
+        });
+      }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+      if (activeState.currentPage + 1 < activeState.pageCount) {
+        postAction({
+          action: "changePage",
+          page: activeState.currentPage + 1
+        });
+      }
+    });
+
     window.updateZplPreview = function(payload) {
       const img = document.getElementById('label-img');
       const placeholder = document.getElementById('placeholder');
       const errBanner = document.getElementById('error-banner');
       const cachedBadge = document.getElementById('badge-cached');
       const quotaBadge = document.getElementById('badge-quota');
-      const dpiBadge = document.getElementById('badge-dpi');
-      const pageIndicator = document.getElementById('page-indicator');
 
       if (payload.error) {
         errBanner.style.display = 'block';
@@ -135,12 +336,25 @@
         img.style.display = 'block';
         img.src = 'data:image/png;base64,' + payload.pngBase64;
 
-        if (payload.pageCount) {
-          pageIndicator.textContent = 'Page ' + ((payload.currentPage || 0) + 1) + '/' + payload.pageCount;
+        if (payload.pageCount !== undefined) {
+          activeState.pageCount = payload.pageCount;
+          activeState.currentPage = payload.currentPage || 0;
+          pageIndicator.textContent = (activeState.currentPage + 1) + ' / ' + activeState.pageCount;
+          prevPageBtn.disabled = activeState.currentPage <= 0;
+          nextPageBtn.disabled = activeState.currentPage + 1 >= activeState.pageCount;
         }
 
         if (payload.dpi) {
-          dpiBadge.textContent = payload.dpi + ' DPI';
+          activeState.dpi = payload.dpi;
+          dpiSelect.value = payload.dpi.toString();
+        }
+
+        if (payload.widthMm && payload.heightMm) {
+          activeState.widthMm = payload.widthMm;
+          activeState.heightMm = payload.heightMm;
+          widthInput.value = payload.widthMm;
+          heightInput.value = payload.heightMm;
+          syncPresetDropdown(payload.widthMm, payload.heightMm);
         }
 
         if (payload.fromCache) {
