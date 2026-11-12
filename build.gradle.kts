@@ -14,11 +14,21 @@ repositories {
     }
 }
 
+intellijPlatform {
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = "242"
+            untilBuild = provider { null }
+        }
+    }
+}
+
 dependencies {
     intellijPlatform {
         local("/home/valerio/Scaricati/GoLand-2026.3")
         bundledPlugin("com.intellij.modules.jcef")
         instrumentationTools()
+        pluginVerifier()
     }
     testImplementation(kotlin("test"))
 }
