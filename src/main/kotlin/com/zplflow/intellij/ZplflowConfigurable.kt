@@ -1,11 +1,14 @@
 package com.zplflow.intellij
 
+import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.options.SearchableConfigurable
+import com.intellij.ui.components.ActionLink
 import com.intellij.util.ui.FormBuilder
+import java.awt.BorderLayout
 import javax.swing.*
 
 class ZplflowConfigurable : SearchableConfigurable {
-    private val apiKeyField = JPasswordField(30)
+    private val apiKeyField = JPasswordField(24)
     private val apiUrlField = JTextField(30)
     private val dpiCombo = JComboBox(arrayOf(152, 203, 300, 600))
     private val widthMmField = JTextField(10)
@@ -21,9 +24,19 @@ class ZplflowConfigurable : SearchableConfigurable {
     override fun getDisplayName(): String = "ZplFlow"
 
     override fun createComponent(): JComponent {
+        val apiKeyRow = JPanel(BorderLayout(8, 0)).apply {
+            add(apiKeyField, BorderLayout.CENTER)
+            val link = ActionLink("Get your free API key") {
+                BrowserUtil.browse("https://zplflow.com")
+            }.apply {
+                setExternalLinkIcon()
+            }
+            add(link, BorderLayout.EAST)
+        }
+
         val panel = FormBuilder.createFormBuilder()
-            .addLabeledComponent("API Key:", apiKeyField)
-            .addTooltip("Your ZplFlow API key (e.g. zpl_live_xxx) with pipelines:apply scope.")
+            .addLabeledComponent("API Key:", apiKeyRow)
+            .addTooltip("Your ZplFlow API key (e.g. zpl_live_xxx). Live preview is free (0 token cost).")
             .addLabeledComponent("API URL:", apiUrlField)
             .addTooltip("Base URL for ZplFlow API (defaults to https://api.zplflow.com).")
             .addLabeledComponent("Default DPI:", dpiCombo)
@@ -35,7 +48,7 @@ class ZplflowConfigurable : SearchableConfigurable {
             .addTooltip("Delay in ms before triggering real-time rendering when in onType mode.")
             .addComponent(lspEnabledBox)
             .addLabeledComponent("Custom LSP Binary Path:", lspPathField)
-            .addTooltip("Leave empty to use bundled ZplFlow LSP binary.")
+            .addTooltip("Leave empty to use bundled ZplFlow LSP binary (runs offline).")
             .addComponentFillVertically(JPanel(), 0)
             .panel
 
