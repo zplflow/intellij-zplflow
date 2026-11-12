@@ -2,7 +2,6 @@ package com.zplflow.intellij.lsp
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerSupportProvider
@@ -38,7 +37,7 @@ class ZplLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
 
     override fun createCommandLine(): GeneralCommandLine {
         val settings = ZplflowSettings.getInstance()
-        val pluginDescriptor = PluginManagerCore.getPlugin(PluginId.getId("com.zplflow"))
+        val pluginDescriptor = PluginManagerCore.loadedPlugins.firstOrNull { it.pluginId.idString == "com.zplflow" }
         val pluginDir = pluginDescriptor?.pluginPath?.toFile()
         val binary = ZplLspServerResolver.resolve(settings.state.lspPath, pluginDir)
             ?: throw IllegalStateException(

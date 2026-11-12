@@ -42,7 +42,7 @@
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.jcef</depends>
+    <depends optional="true">com.intellij.modules.jcef</depends>
     <depends optional="true" config-file="zplflow-lsp.xml">com.intellij.modules.lsp</depends>
 
     <extensions defaultExtensionNs="com.intellij">

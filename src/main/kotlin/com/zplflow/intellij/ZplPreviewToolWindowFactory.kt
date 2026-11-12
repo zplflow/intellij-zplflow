@@ -134,7 +134,7 @@ class ZplPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
 
         fun renderActiveEditor() {
             ApplicationManager.getApplication().invokeLater {
-                val editor = FileEditorManager.getInstance(project).selectedTextEditor
+                val editor = project.getService(FileEditorManager::class.java)?.selectedTextEditor
                 if (editor == null) {
                     LOG.info("ZplFlow: renderActiveEditor - no selectedTextEditor found")
                     return@invokeLater
