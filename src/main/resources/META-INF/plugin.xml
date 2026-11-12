@@ -51,6 +51,11 @@
             fieldName="INSTANCE"
             language="ZPL"
             extensions="zpl;prn;label" />
+        <lang.syntaxHighlighterFactory
+            language="ZPL"
+            implementationClass="com.zplflow.intellij.highlight.ZplSyntaxHighlighterFactory" />
+        <colorSettingsPage
+            implementation="com.zplflow.intellij.highlight.ZplColorSettingsPage" />
         <toolWindow
             id="ZplFlow Preview"
             anchor="right"

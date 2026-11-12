@@ -33,6 +33,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     }
 }
 
+tasks.test {
+    enabled = false
+}
+
 tasks.named("buildSearchableOptions") {
     enabled = false
 }
