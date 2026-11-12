@@ -39,7 +39,7 @@ Official JetBrains IDE plugin for **ZplFlow** — pixel-perfect ZPL thermal labe
 3. Click the gear icon ⚙️ → **Install Plugin from Disk...**.
 4. Select:
    ```
-   build/distributions/intellij-zplflow-0.2.0.zip
+   build/distributions/intellij-zplflow-0.2.1.zip
    ```
 5. Click **Apply** / **OK** and restart IDE if prompted.
 6. Configure your free API key under **Settings → Tools → ZplFlow** (click **Get your free API key**).
