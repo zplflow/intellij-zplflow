@@ -1,24 +1,24 @@
 package com.zplflow.intellij.lsp
 
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.LspServerSupportProvider
-import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
+import com.intellij.platform.lsp.api.LspIntegrationProvider
+import com.intellij.platform.lsp.api.ProjectWideLspClientDescriptor
 import com.zplflow.intellij.ZplFileType
 import com.zplflow.intellij.ZplflowSettings
+import java.io.File
 
-class ZplLspServerSupportProvider : LspServerSupportProvider {
+class ZplLspIntegrationProvider : LspIntegrationProvider {
     override fun fileOpened(
         project: Project,
         file: VirtualFile,
-        serverStarter: LspServerSupportProvider.LspServerStarter
+        clientStarter: LspIntegrationProvider.LspClientStarter
     ) {
         if (isZplFile(file)) {
             val settings = ZplflowSettings.getInstance()
             if (settings.state.lspEnabled) {
-                serverStarter.ensureServerStarted(ZplLspServerDescriptor(project))
+                clientStarter.ensureClientStarted(ZplLspClientDescriptor(project))
             }
         }
     }
@@ -28,17 +28,28 @@ class ZplLspServerSupportProvider : LspServerSupportProvider {
             val ext = file.extension?.lowercase()
             return ext == "zpl" || ext == "prn" || ext == "label" || file.fileType == ZplFileType
         }
+
+        fun resolvePluginDir(): File? {
+            val location = ZplLspIntegrationProvider::class.java.protectionDomain?.codeSource?.location
+                ?: return null
+            val codeFile = runCatching { File(location.toURI()) }.getOrNull() ?: return null
+            val candidates = listOfNotNull(
+                codeFile.parentFile?.parentFile,
+                codeFile.parentFile,
+                codeFile
+            )
+            return candidates.firstOrNull { File(it, "bin").isDirectory } ?: codeFile.parentFile?.parentFile
+        }
     }
 }
 
-class ZplLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "zplflow-lsp") {
+class ZplLspClientDescriptor(project: Project) : ProjectWideLspClientDescriptor(project, "zplflow-lsp") {
     override fun isSupportedFile(file: VirtualFile): Boolean =
-        ZplLspServerSupportProvider.isZplFile(file)
+        ZplLspIntegrationProvider.isZplFile(file)
 
     override fun createCommandLine(): GeneralCommandLine {
         val settings = ZplflowSettings.getInstance()
-        val pluginDescriptor = PluginManager.getPluginByClass(ZplLspServerSupportProvider::class.java)
-        val pluginDir = pluginDescriptor?.pluginPath?.toFile()
+        val pluginDir = ZplLspIntegrationProvider.resolvePluginDir()
         val binary = ZplLspServerResolver.resolve(settings.state.lspPath, pluginDir)
             ?: throw IllegalStateException(
                 "zplflow-lsp binary not found. Please install zplflow-lsp or configure its path in Settings."
