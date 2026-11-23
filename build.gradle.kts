@@ -17,7 +17,7 @@ repositories {
 intellijPlatform {
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "242"
+            sinceBuild = "262"
             untilBuild = provider { null }
         }
     }
